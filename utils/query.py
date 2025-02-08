@@ -57,7 +57,7 @@ def create_folders_and_file(folder_path, filename) ->str:
   except OSError as e:
     print(f"Error creating file: {e}")
 
-def generate_embeddings(data, embedding_path:str="./embeddings")->None:
+def generate_embeddings(data, embedding_path:str="./embeddings", purpose="quickstart")->None:
     print("Generating embeddings...")
 
     load_dotenv()
@@ -80,7 +80,7 @@ def generate_embeddings(data, embedding_path:str="./embeddings")->None:
     document.metadata={"date":datetime.utcnow()}
     db = chromadb.PersistentClient(path=embedding_path)
     # create collection
-    chroma_collection = db.get_or_create_collection("quickstart")
+    chroma_collection = db.get_or_create_collection(purpose)
 
     vector_store = ChromaVectorStore(chroma_collection=chroma_collection)
     storage_context = StorageContext.from_defaults(vector_store=vector_store)
@@ -94,7 +94,7 @@ def generate_embeddings(data, embedding_path:str="./embeddings")->None:
 
 
 
-def query(prompt:str, embedding_path:str="./embeddings") -> str:
+def query(prompt:str, embedding_path:str="./embeddings", purpose="quickstart") -> str:
     model = "llama-3.3-70b-specdec"
     llm = Groq(model=model, api_key=GROQ)
     Settings.llm = llm
@@ -112,7 +112,7 @@ def query(prompt:str, embedding_path:str="./embeddings") -> str:
     db = chromadb.PersistentClient(path=embedding_path)
 
     # get collection
-    chroma_collection = db.get_or_create_collection("quickstart")
+    chroma_collection = db.get_or_create_collection(purpose)
 
     # assign chroma as the vector_store to the context
     vector_store = ChromaVectorStore(chroma_collection=chroma_collection)
